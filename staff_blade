@@ -530,12 +530,12 @@
                         <div class="d-block">
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="is_working" id="workingYes"
-                                    value="yes" />
+                                    value="Yes" />
                                 <label class="form-check-label" for="workingYes">Yes</label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="is_working" id="workingNo" checked
-                                    value="no" />
+                                    value="No" />
                                 <label class="form-check-label" for="workingNo">No</label>
                             </div>
                         </div>
@@ -562,12 +562,12 @@
                         <div class="d-block">
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="has_children" id="childrenYes"
-                                    value="yes" />
+                                    value="Yes" />
                                 <label class="form-check-label" for="childrenYes">Yes</label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="has_children" id="childrenNo" checked
-                                    value="no" />
+                                    value="No" />
                                 <label class="form-check-label" for="childrenNo">No</label>
                             </div>
                         </div>
@@ -586,12 +586,12 @@
                         <div class="d-block">
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="has_Siblings" id="SiblingsYes"
-                                    value="yes" />
+                                    value="Yes" />
                                 <label class="form-check-label" for="SiblingsYes">Yes</label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="has_Siblings" id="SiblingsNo" checked
-                                    value="no" />
+                                    value="No" />
                                 <label class="form-check-label" for="SiblingsNo">No</label>
                             </div>
                         </div>
@@ -821,12 +821,12 @@
                         <div class="d-block">
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input required-field" type="radio" name="is_Course"
-                                    id="CourseYes" value="yes" />
+                                    id="CourseYes" value="Yes" />
                                 <label class="form-check-label" for="CourseYes">Yes</label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input required-field" type="radio" name="is_Course"
-                                    id="CourseNo" value="no" checked />
+                                    id="CourseNo" value="No" checked />
                                 <label class="form-check-label" for="CourseNo">No</label>
                             </div>
                         </div>
@@ -955,7 +955,7 @@
                                                     </div>
                                                     <div class="col-lg-12 mb-3">
                                                         <label class="text-black mb-1 fs-6 fw-semibold">Exit Reason<span class="text-danger">*</span></label>
-                                                        <textarea class="form-control required-field" rows="1" name="ExitReason" placeholder="Enter Exit Reason"></textarea>
+                                                        <textarea class="form-control required-field" rows="1" name="ExitReason[]" placeholder="Enter Exit Reason"></textarea>
                                                          <div class="text-danger error_msg"></div>
                                                     </div>
                                                 </div>
@@ -1233,7 +1233,7 @@
                             </div>
                             <div class="col-lg-4">
                                 <label class="fw-semibold mb-1 text-black">
-                                    <input class="form-check-input me-2" type="checkbox" id="other_access"
+                                    <input class="form-check-input me-2" type="checkbox" id="other_access" value="1"
                                         name="other_access" data-bs-toggle="modal"
                                         data-bs-target="#kt_modal_other_credentials" />Other Credentials
                                 </label>
@@ -1425,26 +1425,26 @@
                                 @switch($depend->field_value)
 
                                     @case('text_field')
-                                        <input type="text" class="form-control" placeholder="Enter {{ $depend->field_name }}">
+                                        <input type="text" name="depend_{{ $depend->sno }}" class="form-control" placeholder="Enter {{ $depend->field_name }}">
                                         @break
 
                                     @case('text_area')
-                                        <textarea class="form-control" rows="3" placeholder="Enter {{ $depend->field_name }}"></textarea>
+                                        <textarea class="form-control" name="depend_{{ $depend->sno }}" rows="3" placeholder="Enter {{ $depend->field_name }}"></textarea>
                                         @break
 
                                     @case('date_field')
-                                        <input type="date" class="form-control">
+                                        <input type="date" name="depend_{{ $depend->sno }}" class="form-control">
                                         @break
 
                                     @case('multiple_images')
-                                        <input type="file" class="form-control" multiple accept="image/*">
+                                        <input type="file" class="form-control" name="depend_{{ $depend->sno }}[]" multiple accept="image/*">
                                         @break
 
                                     @case('check_box')
                                         <div class="d-block">
                                             @foreach($dep_options as $opt)
                                                 <div class="form-check form-check-inline">
-                                                    <input class="form-check-input" type="checkbox" value="{{ $opt['label'] }}">
+                                                    <input class="form-check-input" type="checkbox" value="{{ $opt['label'] }}" name="depend_{{ $depend->sno }}[]">
                                                     <label class="form-check-label">{{ $opt['label'] }}</label>
                                                 </div>
                                             @endforeach
@@ -1466,7 +1466,7 @@
                                         @break
 
                                     @case('list_box')
-                                        <select class="form-select select3">
+                                        <select class="form-select select3" name="depend_{{ $depend->sno }}">
                                             <option value="">Select {{ $depend->field_name }}</option>
                                             @foreach($dep_options as $opt)
                                                 <option value="{{ $opt['label'] }}">{{ $opt['label'] }}</option>
@@ -1684,20 +1684,14 @@
     <!--begin::Modal - Other Credentials-->
     <div class="modal fade" id="kt_modal_other_credentials" tabindex="-1" aria-hidden="true"
         data-bs-keyboard="false" data-bs-backdrop="static">
-        <!--begin::Modal dialog-->
         <div class="modal-dialog modal-lg">
-            <!--begin::Modal content-->
             <div class="modal-content rounded">
-                <!--begin::Modal header-->
-                <div
-                    class="modal-header d-flex align-items-center justify-content-between border border-bottom-1 pb-0 mb-4">
+                <div class="modal-header d-flex align-items-center justify-content-between border border-bottom-1 pb-0 mb-4">
                     <div class="text-center mt-4">
                         <h3 class="text-center text-black">Other Credentials</h3>
                     </div>
-                    <!--begin::Close-->
                     <div class="btn btn-sm btn-icon btn-active-color-primary rounded border border-black"
                         data-bs-dismiss="modal">
-                        <!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
                         <span class="svg-icon svg-icon-1">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="#000"
                                 xmlns="http://www.w3.org/2000/svg">
@@ -1707,123 +1701,73 @@
                                     transform="rotate(45 7.41422 6)" fill="#000" />
                             </svg>
                         </span>
-                        <!--end::Svg Icon-->
                     </div>
-                    <!--end::Close-->
                 </div>
-                <!--end::Modal header-->
-                <!--begin::Modal body-->
+
                 <div class="modal-body pt-0 pb-10 px-10 px-xl-20">
                     <div class="row mt-2">
                         <div class="col-lg-12 mb-3">
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input cred_check" type="checkbox" id="skype_id"
-                                    data-cred="skype" />
-                                <label class="text-black mb-1 fs-6 fw-semibold">Teams</label>
-                            </div>
+                            @if(isset($credential_list) && count($credential_list) > 0)
+                                @foreach($credential_list as $cred)
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input cred_check" type="checkbox"
+                                            id="cred_{{$cred->sno}}" data-cred="{{$cred->sno}}" />
+                                        <label class="text-black mb-1 fs-6 fw-semibold">
+                                            {{$cred->credential_name}}
+                                        </label>
+                                    </div>
+                                @endforeach
+                            @endif
+                        </div>
 
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input cred_check" type="checkbox" id="spark_id"
-                                    data-cred="spark" />
-                                <label class="text-black mb-1 fs-6 fw-semibold">Spark</label>
-                            </div>
-
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input cred_check" type="checkbox" id="firewall_id"
-                                    data-cred="firewall" />
-                                <label class="text-black mb-1 fs-6 fw-semibold">Firewall</label>
-                            </div>
-                        </div>
-                        <div class="mb-2" id="skype_cred" style="display: none;">
-                            <h5 class="title fw-bold mt-2">Teams Credentials</h5>
-                            <div class="row mt-2">
-                                <div class="col-lg-3 mb-3">
-                                    <label class="text-black mb-1 fs-6 fw-semibold">User Name<span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id=""
-                                        placeholder="Enter User Name" />
+                        @if(isset($credential_list))
+                            @foreach($credential_list as $cred)
+                                <div class="mb-2" id="cred_field_{{$cred->sno}}" style="display:none;">
+                                    <h5 class="title fw-bold mt-2">{{$cred->credential_name}} Credentials</h5>
+                                    <div class="row mt-2">
+                                        <div class="col-lg-3 mb-3">
+                                            <label class="text-black mb-1 fs-6 fw-semibold">User Name<span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control"
+                                                name="credential[{{$cred->sno}}][username]"
+                                                placeholder="Enter User Name" />
+                                        </div>
+                                        <div class="col-lg-3 mb-3">
+                                            <label class="text-black mb-1 fs-6 fw-semibold">Password<span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control"
+                                                name="credential[{{$cred->sno}}][password]"
+                                                placeholder="Enter Password" />
+                                        </div>
+                                        <div class="col-lg-3 mb-3">
+                                            <label class="text-black mb-1 fs-6 fw-semibold">URL</label>
+                                            <input type="text" class="form-control"
+                                                name="credential[{{$cred->sno}}][url]"
+                                                placeholder="Enter URL" />
+                                        </div>
+                                        <div class="col-lg-3 mb-3">
+                                            <label class="text-black mb-1 fs-6 fw-semibold">Description</label>
+                                            <textarea class="form-control" rows="1"
+                                                name="credential[{{$cred->sno}}][description]"
+                                                placeholder="Enter Description">-</textarea>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-lg-3 mb-3">
-                                    <label class="text-black mb-1 fs-6 fw-semibold">Password<span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id=""
-                                        placeholder="Enter password" />
-                                </div>
-                                <div class="col-lg-3 mb-3">
-                                    <label class="text-black mb-1 fs-6 fw-semibold">URL</label>
-                                    <input type="text" class="form-control" id=""
-                                        placeholder="Enter URL" />
-                                </div>
-                                <div class="col-lg-3 mb-3">
-                                    <label class="text-black mb-1 fs-6 fw-semibold">Description</label>
-                                    <textarea class="form-control" rows="1" id="" placeholder="Enter Description">-</textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-2" id="spark_cred" style="display: none;">
-                            <h5 class="title fw-bold mt-2">Spark Credentials</h5>
-                            <div class="row">
-                                <div class="col-lg-3 mb-3">
-                                    <label class="text-black mb-1 fs-6 fw-semibold">User Name<span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id=""
-                                        placeholder="Enter User Name" />
-                                </div>
-                                <div class="col-lg-3 mb-3">
-                                    <label class="text-black mb-1 fs-6 fw-semibold">Password<span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id=""
-                                        placeholder="Enter password" />
-                                </div>
-                                <div class="col-lg-3 mb-3">
-                                    <label class="text-black mb-1 fs-6 fw-semibold">URL</label>
-                                    <input type="text" class="form-control" id=""
-                                        placeholder="Enter URL" />
-                                </div>
-                                <div class="col-lg-3 mb-3">
-                                    <label class="text-black mb-1 fs-6 fw-semibold">Description</label>
-                                    <textarea class="form-control" rows="1" id="" placeholder="Enter Description">-</textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-2" id="firewall_cred" style="display: none;">
-                            <h5 class="title fw-bold mt-2">Firewall Credentials</h5>
-                            <div class="row">
-                                <div class="col-lg-3 mb-3">
-                                    <label class="text-black mb-1 fs-6 fw-semibold">User Name<span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id=""
-                                        placeholder="Enter User Name" />
-                                </div>
-                                <div class="col-lg-3 mb-3">
-                                    <label class="text-black mb-1 fs-6 fw-semibold">Password<span
-                                            class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id=""
-                                        placeholder="Enter password" />
-                                </div>
-                                <div class="col-lg-3 mb-3">
-                                    <label class="text-black mb-1 fs-6 fw-semibold">URL</label>
-                                    <input type="text" class="form-control" id=""
-                                        placeholder="Enter URL" />
-                                </div>
-                                <div class="col-lg-3 mb-3">
-                                    <label class="text-black mb-1 fs-6 fw-semibold">Description</label>
-                                    <textarea class="form-control" rows="1" id="" placeholder="Enter Description">-</textarea>
-                                </div>
-                            </div>
-                        </div>
+                            @endforeach
+                        @endif
                     </div>
+
                     <div class="d-flex justify-content-between align-items-center pb-4">
                         <button type="button" class="btn btn-outline-danger me-3"
                             data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" >Give Access</button>
+                       <button type="button" class="btn btn-primary" id="btn_give_access">Give Access</button>
                     </div>
                 </div>
             </div>
         </div>
-        <!--end::Modal body-->
     </div>
     <!--end::Modal - Other Credentials-->
+
 
     <!--begin::Modal - Confirmation Staff-->
     <div class="modal fade" id="kt_modal_confirmation_staff" tabindex="-1" aria-hidden="true" aria-hidden="true"
@@ -1860,49 +1804,86 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
 
-    <script>
-        'use strict';
+  <script>
+$(document).ready(function() {
+    // Toggle credential fields in modal
+    $('.cred_check').on('change', function() {
+        const credId = $(this).data('cred');
+        if ($(this).is(':checked')) {
+            $('#cred_field_' + credId).slideDown();
+        } else {
+            $('#cred_field_' + credId).slideUp();
+        }
+    });
 
-        (function() {
-            const credentials_acrd = document.querySelectorAll('.credentials_acrd');
-            credentials_acrd.forEach(el => {
-                el.addEventListener('click', event => {
-                    event.preventDefault();
-                    const card = el.closest('.card');
-                    const collapseEl = card.querySelector('.collapse.credentials_acrd_body');
+    // Auto-open modal when checkbox checked
+    $('#other_access').on('change', function() {
+        if ($(this).is(':checked')) {
+            $('#kt_modal_other_credentials').modal('show');
+        } else {
+            // Remove hidden inputs when unchecked
+            $('input[name^="credential["], textarea[name^="credential["]').remove();
+        }
+    });
 
-                    new bootstrap.Collapse(collapseEl);
-                    card.querySelector('.card-header').classList.toggle('collapsed');
-                    Helpers._toggleClass(el.firstElementChild, 'mdi-chevron-down', 'mdi-chevron-up');
-                });
-            });
-            function toggleCredential(id, show) {
-                const section = document.getElementById(id + '_cred');
-                if (section) section.style.display = show ? 'block' : 'none';
+    // When modal is reopened, restore visibility for already checked creds
+    $('#kt_modal_other_credentials').on('show.bs.modal', function() {
+        $('.cred_check').each(function() {
+            const credId = $(this).data('cred');
+            if ($(this).is(':checked')) {
+                $('#cred_field_' + credId).show();
             }
+        });
+    });
 
-            document.getElementById('credential_check_all')?.addEventListener('change', function() {
-                const checked = this.checked;
-                document.querySelectorAll('.cred_check').forEach(cb => {
-                    cb.checked = checked;
-                    toggleCredential(cb.dataset.cred, checked);
-                });
-            });
+    // Validate and save credential data on "Give Access" button click
+    $('#btn_give_access').on('click', function() {
+        let valid = true;
 
-            document.querySelectorAll('.cred_check').forEach(cb => {
-                cb.addEventListener('change', function() {
-                    toggleCredential(this.dataset.cred, this.checked);
-                });
-            });
+        // Validate visible credential fields
+        $('.cred_check:checked').each(function() {
+            const credId = $(this).data('cred');
+            const username = $(`input[name="credential[${credId}][username]"]`).val().trim();
+            const password = $(`input[name="credential[${credId}][password]"]`).val().trim();
 
-            document.getElementById('create_cred')?.addEventListener('change', function() {
-                const value = this.value;
-                ['skype', 'spark', 'firewall'].forEach(id => {
-                    toggleCredential(id, id === value);
-                });
+            if (username === '' || password === '') {
+                valid = false;
+                $(`#cred_field_${credId}`).find('input').addClass('is-invalid');
+            } else {
+                $(`#cred_field_${credId}`).find('input').removeClass('is-invalid');
+            }
+        });
+
+        if (!valid) {
+            alert('Please fill required Username and Password for selected credentials.');
+            return;
+        }
+
+        // Remove old hidden credentials before adding new ones
+        $('#staff_form').find('input[name^="credential["], textarea[name^="credential["]').remove();
+
+        // Append selected credential data as hidden inputs
+        $('.cred_check:checked').each(function() {
+            const credId = $(this).data('cred');
+            const fields = ['username', 'password', 'url', 'description'];
+
+            fields.forEach(field => {
+                const value = $(`input[name="credential[${credId}][${field}]"], textarea[name="credential[${credId}][${field}]"]`).val();
+                $('<input>').attr({
+                    type: 'hidden',
+                    name: `credential[${credId}][${field}]`,
+                    value: value
+                }).appendTo('#staff_form');
             });
-        })();
-    </script>
+        });
+
+        // Close modal after save
+        $('#kt_modal_other_credentials').modal('hide');
+    });
+});
+</script>
+
+
 
     <script>
         var pendingtasks = document.querySelector('#pending-tasks');
@@ -2145,7 +2126,7 @@
 
             // Toggle visibility based on Yes/No selection
             $('input[name="is_Course"]').on('change', function() {
-                if ($(this).val() === 'yes') {
+                if ($(this).val() === 'Yes') {
                     $('#courseAttachmentHeader, #courseDocumentWrapper, #addCourseBtnWrapper').removeClass(
                         'd-none');
                 } else {
@@ -2217,7 +2198,7 @@
     <script>
         $(document).ready(function() {
             $('input[name="is_working"]').on('change', function() {
-                if ($(this).val() === 'yes') {
+                if ($(this).val() === 'Yes') {
                     $('.working-fields').removeClass('d-none');
                 } else {
                     $('.working-fields').addClass('d-none');
@@ -2230,7 +2211,7 @@
     <script>
         $(document).ready(function() {
             $('input[name="has_Siblings"]').on('change', function() {
-                if ($(this).val() === 'yes') {
+                if ($(this).val() === 'Yes') {
                     $('#siblingsDescription').removeClass('d-none');
                 } else {
                     $('#siblingsDescription').addClass('d-none');
@@ -2559,323 +2540,323 @@
         }
     // ===== STAGE 1 =====
     if (stage === 1) {
-            if (!$('#staff_name').val().trim()) { $('#staff_name_err').text('Staff Name is required.'); err = true; }else{$('#staff_name_err').text('');}
-            if (!$('#mobile_no').val().trim()) { $('#mobile_no_err').text('Mobile Number is required.'); err = true; }else{$('#mobile_no_err').text('');}
-            if (!$('#staff_dob').val().trim()) { $('#staff_dob_err').text('Date Of Birth is required.'); err = true; }else{$('#staff_dob_err').text('');}
+        //     if (!$('#staff_name').val().trim()) { $('#staff_name_err').text('Staff Name is required.'); err = true; }else{$('#staff_name_err').text('');}
+        //     if (!$('#mobile_no').val().trim()) { $('#mobile_no_err').text('Mobile Number is required.'); err = true; }else{$('#mobile_no_err').text('');}
+        //     if (!$('#staff_dob').val().trim()) { $('#staff_dob_err').text('Date Of Birth is required.'); err = true; }else{$('#staff_dob_err').text('');}
             
-          const email = $('#email_id').val().trim();
-            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-            if(email == ''){
-                $('#email_id_err').text('Email Id is required.'); err = true;
-            }else if (email !== '' && !emailPattern.test(email)) {
-                $('#email_id_err').text('Enter a valid Email ID.');
-                err = true;
-            }else{
-                $('#email_id_err').text('');
-            }
-            if (!$('#mother_tongue').val().trim()) { $('#mother_tongue_err').text('Mother Tongue is required.'); err = true; }else{$('#mother_tongue_err').text('');}
-            if ($('#Languages').val()=="") { $('#Languages_err').text('Language is required.'); err = true; }else{$('#Languages_err').text('');}
+        //   const email = $('#email_id').val().trim();
+        //     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        //     if(email == ''){
+        //         $('#email_id_err').text('Email Id is required.'); err = true;
+        //     }else if (email !== '' && !emailPattern.test(email)) {
+        //         $('#email_id_err').text('Enter a valid Email ID.');
+        //         err = true;
+        //     }else{
+        //         $('#email_id_err').text('');
+        //     }
+        //     if (!$('#mother_tongue').val().trim()) { $('#mother_tongue_err').text('Mother Tongue is required.'); err = true; }else{$('#mother_tongue_err').text('');}
+        //     if ($('#Languages').val()=="") { $('#Languages_err').text('Language is required.'); err = true; }else{$('#Languages_err').text('');}
 
         if (!err) safeNext(stage); // ✅ only go next if no validation errors
     }
     // ===== STAGE 2 =====
     else if(stage === 2) {
-        if (!$('#father_name').val().trim()) { $('#father_name_err').text('Father Name is required.'); err = true; }else{$('#father_name_err').text('')}
-        if (!$('#father_occup').val().trim()) { $('#father_occup_err').text('Father Occupation is required.'); err = true; }else{$('#father_occup_err').text('')}
-        if (!$('#mother_name').val().trim()) { $('#mother_name_err').text('Mother Name is required.'); err = true; }else{$('#mother_name_err').text('')}
-        if (!$('#mother_occup').val().trim()) { $('#mother_occup_err').text('Mother Occupation is required.'); err = true; }else{$('#mother_occup_err').text('')}
-        if (!$('#marital_status').val().trim()) { $('#marital_status_err').text('Marital Status is required.'); err = true; }else{$('#marital_status_err').text('')}
-        var marital_status=$('#marital_status').val().trim();
+        // if (!$('#father_name').val().trim()) { $('#father_name_err').text('Father Name is required.'); err = true; }else{$('#father_name_err').text('')}
+        // if (!$('#father_occup').val().trim()) { $('#father_occup_err').text('Father Occupation is required.'); err = true; }else{$('#father_occup_err').text('')}
+        // if (!$('#mother_name').val().trim()) { $('#mother_name_err').text('Mother Name is required.'); err = true; }else{$('#mother_name_err').text('')}
+        // if (!$('#mother_occup').val().trim()) { $('#mother_occup_err').text('Mother Occupation is required.'); err = true; }else{$('#mother_occup_err').text('')}
+        // if (!$('#marital_status').val().trim()) { $('#marital_status_err').text('Marital Status is required.'); err = true; }else{$('#marital_status_err').text('')}
+        // var marital_status=$('#marital_status').val().trim();
         
-        if(marital_status==1){
-            if (!$('#anniversary_date').val().trim()) { $('#anniversary_date_err').text('Anniversary Date is required.'); err = true; }else{$('#anniversary_date_err').text('')}
-            if (!$('#spouse_name').val().trim()) { $('#spouse_name_err').text('Spouse Name is required.'); err = true; }else{$('#spouse_name_err').text('')}
-            if (!$('#spouse_mobile').val().trim()) { $('#spouse_mobile_err').text('Spouse Mobile No is required.'); err = true; }else{$('#spouse_mobile_err').text('')}
-            if (!$('#spouse_dob').val().trim()) { $('#spouse_dob_err').text('Spouse Date Of Birth is required.'); err = true; }else{$('#spouse_dob_err').text('')}
-            if($('#workingYes').prop('checked')){
-                if (!$('#spouse_designation').val().trim()) { $('#spouse_designation_err').text('Spouse Designation is required.'); err = true; }else{$('#spouse_designation_err').text('')}
-                if (!$('#spouse_company_name').val().trim()) { $('#spouse_company_name_err').text('Spouse Company Name is required.'); err = true; }else{$('#spouse_company_name_err').text('')}
-                if (!$('#spouse_salary').val().trim()) { $('#spouse_salary_err').text('Spouse Salary is required.'); err = true; }else{$('#spouse_salary_err').text('')}
-            }
-        }
+        // if(marital_status==1){
+        //     if (!$('#anniversary_date').val().trim()) { $('#anniversary_date_err').text('Anniversary Date is required.'); err = true; }else{$('#anniversary_date_err').text('')}
+        //     if (!$('#spouse_name').val().trim()) { $('#spouse_name_err').text('Spouse Name is required.'); err = true; }else{$('#spouse_name_err').text('')}
+        //     if (!$('#spouse_mobile').val().trim()) { $('#spouse_mobile_err').text('Spouse Mobile No is required.'); err = true; }else{$('#spouse_mobile_err').text('')}
+        //     if (!$('#spouse_dob').val().trim()) { $('#spouse_dob_err').text('Spouse Date Of Birth is required.'); err = true; }else{$('#spouse_dob_err').text('')}
+        //     if($('#workingYes').prop('checked')){
+        //         if (!$('#spouse_designation').val().trim()) { $('#spouse_designation_err').text('Spouse Designation is required.'); err = true; }else{$('#spouse_designation_err').text('')}
+        //         if (!$('#spouse_company_name').val().trim()) { $('#spouse_company_name_err').text('Spouse Company Name is required.'); err = true; }else{$('#spouse_company_name_err').text('')}
+        //         if (!$('#spouse_salary').val().trim()) { $('#spouse_salary_err').text('Spouse Salary is required.'); err = true; }else{$('#spouse_salary_err').text('')}
+        //     }
+        // }
         
-        if ($('#childrenYes').prop('checked')) {
-            if (!$('#childrenCount').val().trim()) {
-                $('#childrenCount_err').text('Children Count is required.');
-                err = true;
-            } else {
-                $('#childrenCount_err').text('');
-            }
+        // if ($('#childrenYes').prop('checked')) {
+        //     if (!$('#childrenCount').val().trim()) {
+        //         $('#childrenCount_err').text('Children Count is required.');
+        //         err = true;
+        //     } else {
+        //         $('#childrenCount_err').text('');
+        //     }
 
-            // ✅ Validate each dynamically added child field
-            $('#childrenDetails .row').each(function (index) {
-                const childIndex = index + 1;
+        //     // ✅ Validate each dynamically added child field
+        //     $('#childrenDetails .row').each(function (index) {
+        //         const childIndex = index + 1;
 
-                const childNameField = $(this).find('input[name="child_name[]"]');
-                const childDobField = $(this).find('input[name="child_dob[]"]');
-                const childStdField = $(this).find('input[name="child_std[]"]');
-                const childYearField = $(this).find('input[name="child_year[]"]');
+        //         const childNameField = $(this).find('input[name="child_name[]"]');
+        //         const childDobField = $(this).find('input[name="child_dob[]"]');
+        //         const childStdField = $(this).find('input[name="child_std[]"]');
+        //         const childYearField = $(this).find('input[name="child_year[]"]');
 
-                const childName = childNameField.val().trim();
-                const childDob = childDobField.val().trim();
-                const childStd = childStdField.val().trim();
-                const childYear = childYearField.val().trim();
+        //         const childName = childNameField.val().trim();
+        //         const childDob = childDobField.val().trim();
+        //         const childStd = childStdField.val().trim();
+        //         const childYear = childYearField.val().trim();
 
-                // Clear previous error messages
-                $(this).find('.error_msg').text('');
+        //         // Clear previous error messages
+        //         $(this).find('.error_msg').text('');
 
-                if (!childName) {
-                    childNameField.closest('.err-chk').find('.error_msg').text('Please enter the child name.');
-                    err = true;
-                }
+        //         if (!childName) {
+        //             childNameField.closest('.err-chk').find('.error_msg').text('Please enter the child name.');
+        //             err = true;
+        //         }
 
-                if (!childDob) {
-                    childDobField.closest('.err-chk').find('.error_msg').text('Please select the date of birth.');
-                    err = true;
-                }
+        //         if (!childDob) {
+        //             childDobField.closest('.err-chk').find('.error_msg').text('Please select the date of birth.');
+        //             err = true;
+        //         }
 
-                if (!childStd) {
-                    childStdField.closest('.err-chk').find('.error_msg').text('Please enter the standard or degree.');
-                    err = true;
-                }
+        //         if (!childStd) {
+        //             childStdField.closest('.err-chk').find('.error_msg').text('Please enter the standard or degree.');
+        //             err = true;
+        //         }
 
-                if (!childYear) {
-                    childYearField.closest('.err-chk').find('.error_msg').text('Please enter the completion year.');
-                    err = true;
-                }
-            });
-        }
+        //         if (!childYear) {
+        //             childYearField.closest('.err-chk').find('.error_msg').text('Please enter the completion year.');
+        //             err = true;
+        //         }
+        //     });
+        // }
         
-        if($('#SiblingsYes').prop('checked')){
-             if (!$('#siblings_detail').val().trim()) { $('#siblings_detail_err').text('Siblings Detail is required.'); err = true; }else{$('#siblings_detail_err').text('')}
-        }
+        // if($('#SiblingsYes').prop('checked')){
+        //      if (!$('#siblings_detail').val().trim()) { $('#siblings_detail_err').text('Siblings Detail is required.'); err = true; }else{$('#siblings_detail_err').text('')}
+        // }
         
 
         if (!err) safeNext(stage); // ✅ only go next if no validation errors
     }
     // ===== STAGE 3 =====
     else if (stage === 3) {
-             if (!$('#permanent_address').val().trim()) { $('#permanent_address_err').text('Permanent Address is required.'); err = true; }else{$('#permanent_address_err').text('')}
-               // Validate Contact Person(s)
-            $('#altmobile-wrapper .altmobile-row').each(function (index) {
-                const nameInput = $(this).find('input[name="contact_person_name[]"]');
-                const mobileInput = $(this).find('input[name="contact_person_no[]"]');
-                const nameErr = $(this).find('#contact_person_name_err');
-                const mobileErr = $(this).find('#contact_person_no_err');
+            //  if (!$('#permanent_address').val().trim()) { $('#permanent_address_err').text('Permanent Address is required.'); err = true; }else{$('#permanent_address_err').text('')}
+            //    // Validate Contact Person(s)
+            // $('#altmobile-wrapper .altmobile-row').each(function (index) {
+            //     const nameInput = $(this).find('input[name="contact_person_name[]"]');
+            //     const mobileInput = $(this).find('input[name="contact_person_no[]"]');
+            //     const nameErr = $(this).find('#contact_person_name_err');
+            //     const mobileErr = $(this).find('#contact_person_no_err');
 
-                let rowErr = false;
+            //     let rowErr = false;
 
-                // Name validation
-                if (!nameInput.val().trim()) {
-                    nameErr.text('Contact person name is required.');
-                    rowErr = true;
-                } else {
-                    nameErr.text('');
-                }
+            //     // Name validation
+            //     if (!nameInput.val().trim()) {
+            //         nameErr.text('Contact person name is required.');
+            //         rowErr = true;
+            //     } else {
+            //         nameErr.text('');
+            //     }
 
-                // Mobile validation (required + 10 digits)
-                const mobileVal = mobileInput.val().trim();
-                if (!mobileVal) {
-                    mobileErr.text('Contact person mobile number is required.');
-                    rowErr = true;
-                } else if (!/^\d{10}$/.test(mobileVal)) {
-                    mobileErr.text('Enter a valid 10-digit mobile number.');
-                    rowErr = true;
-                } else {
-                    mobileErr.text('');
-                }
+            //     // Mobile validation (required + 10 digits)
+            //     const mobileVal = mobileInput.val().trim();
+            //     if (!mobileVal) {
+            //         mobileErr.text('Contact person mobile number is required.');
+            //         rowErr = true;
+            //     } else if (!/^\d{10}$/.test(mobileVal)) {
+            //         mobileErr.text('Enter a valid 10-digit mobile number.');
+            //         rowErr = true;
+            //     } else {
+            //         mobileErr.text('');
+            //     }
 
-                if (rowErr) err = true;
-            });
+            //     if (rowErr) err = true;
+            // });
         
         if (!err) safeNext(stage);
     }
     // ===== STAGE 4 =====
     else if (stage === 4) {
-        const socialMediaFields = document.querySelectorAll('.toggle-field');
-        let err = false; // ensure err variable starts false here if this block runs independently
+        // const socialMediaFields = document.querySelectorAll('.toggle-field');
+        // let err = false; // ensure err variable starts false here if this block runs independently
 
-        socialMediaFields.forEach(checkbox => {
-            const socialMediaId = checkbox.getAttribute('id').replace('checkSocialMedia_', '');
-            const urlInput = document.querySelector(`#socialMediaField_${socialMediaId} input`);
-            const errorElement = document.querySelector(`#checkSocialMedia_${socialMediaId}_err`);
+        // socialMediaFields.forEach(checkbox => {
+        //     const socialMediaId = checkbox.getAttribute('id').replace('checkSocialMedia_', '');
+        //     const urlInput = document.querySelector(`#socialMediaField_${socialMediaId} input`);
+        //     const errorElement = document.querySelector(`#checkSocialMedia_${socialMediaId}_err`);
 
-            // Only validate if checkbox is checked
-            if (checkbox.checked) {
-                const url = urlInput.value.trim();
+        //     // Only validate if checkbox is checked
+        //     if (checkbox.checked) {
+        //         const url = urlInput.value.trim();
 
-                if (url === '') {
-                    errorElement.textContent = `${checkbox.nextElementSibling.innerText} URL is required.`;
-                    err = true;
-                } 
-                else if (!isValidURL(url)) {
-                    errorElement.textContent = `Please enter a valid ${checkbox.nextElementSibling.innerText} URL.`;
-                    err = true;
-                } 
-                else {
-                    errorElement.textContent = '';
-                }
-            } else {
-                // Clear error and input if unchecked
-                errorElement.textContent = '';
-                urlInput.value = '';
-            }
-        });
+        //         if (url === '') {
+        //             errorElement.textContent = `${checkbox.nextElementSibling.innerText} URL is required.`;
+        //             err = true;
+        //         } 
+        //         else if (!isValidURL(url)) {
+        //             errorElement.textContent = `Please enter a valid ${checkbox.nextElementSibling.innerText} URL.`;
+        //             err = true;
+        //         } 
+        //         else {
+        //             errorElement.textContent = '';
+        //         }
+        //     } else {
+        //         // Clear error and input if unchecked
+        //         errorElement.textContent = '';
+        //         urlInput.value = '';
+        //     }
+        // });
 
         if (!err) safeNext(stage);
     }
     // ===== STAGE 5 =====
     else if (stage === 5) {
 
-         $("#education-wrapper .education-row").each(function (index) {
-            const $row = $(this);
-            const qualification = $row.find('select[name="qualification_type[]"]');
-            const degree = $row.find('input[name="degree[]"]');
-            const major = $row.find('input[name="major[]"]');
-            const univ = $row.find('input[name="univ_name[]"]');
+        //  $("#education-wrapper .education-row").each(function (index) {
+        //     const $row = $(this);
+        //     const qualification = $row.find('select[name="qualification_type[]"]');
+        //     const degree = $row.find('input[name="degree[]"]');
+        //     const major = $row.find('input[name="major[]"]');
+        //     const univ = $row.find('input[name="univ_name[]"]');
 
-            // Find the associated error containers robustly (look inside this row)
-            const qualificationErr = $row.find(".error_msg").eq(0); // first error_msg in the row — for select
-            const degreeErr = $row.find('input[name="degree[]"]').siblings(".error_msg");
-            const majorErr = $row.find('input[name="major[]"]').siblings(".error_msg");
-            const univErr = $row.find('input[name="univ_name[]"]').siblings(".error_msg");
+        //     // Find the associated error containers robustly (look inside this row)
+        //     const qualificationErr = $row.find(".error_msg").eq(0); // first error_msg in the row — for select
+        //     const degreeErr = $row.find('input[name="degree[]"]').siblings(".error_msg");
+        //     const majorErr = $row.find('input[name="major[]"]').siblings(".error_msg");
+        //     const univErr = $row.find('input[name="univ_name[]"]').siblings(".error_msg");
 
-            // Clear previous messages
-            qualificationErr.text("");
-            degreeErr.text("");
-            majorErr.text("");
-            univErr.text("");
+        //     // Clear previous messages
+        //     qualificationErr.text("");
+        //     degreeErr.text("");
+        //     majorErr.text("");
+        //     univErr.text("");
 
-            // --- Qualification check (robust) ---
-            const qualVal = qualification.val();
-            if (!qualVal || String(qualVal).trim() === "") {
-                qualificationErr.text("Qualification Type is required.");
-                err = true;
-            }
+        //     // --- Qualification check (robust) ---
+        //     const qualVal = qualification.val();
+        //     if (!qualVal || String(qualVal).trim() === "") {
+        //         qualificationErr.text("Qualification Type is required.");
+        //         err = true;
+        //     }
 
-            // Degree
-            const degreeVal = degree.val() || "";
-            if (!degreeVal.trim()) {
-                degreeErr.text("Degree is required.");
-                err = true;
-            }
+        //     // Degree
+        //     const degreeVal = degree.val() || "";
+        //     if (!degreeVal.trim()) {
+        //         degreeErr.text("Degree is required.");
+        //         err = true;
+        //     }
 
-            // Major
-            const majorVal = major.val() || "";
-            if (!majorVal.trim()) {
-                majorErr.text("Major is required.");
-                err = true;
-            }
+        //     // Major
+        //     const majorVal = major.val() || "";
+        //     if (!majorVal.trim()) {
+        //         majorErr.text("Major is required.");
+        //         err = true;
+        //     }
 
-            // University / Institute
-            const univVal = univ.val() || "";
-            if (!univVal.trim()) {
-                univErr.text("Institute / University Name is required.");
-                err = true;
-            }
-        });
+        //     // University / Institute
+        //     const univVal = univ.val() || "";
+        //     if (!univVal.trim()) {
+        //         univErr.text("Institute / University Name is required.");
+        //         err = true;
+        //     }
+        // });
 
-        // === Validate "Any Course Completed?" ===
-        const courseTag = $("#course_tag");
-        const courseTagErr = courseTag.siblings(".error_msg");
-        courseTagErr.text("");
+        // // === Validate "Any Course Completed?" ===
+        // const courseTag = $("#course_tag");
+        // const courseTagErr = courseTag.siblings(".error_msg");
+        // courseTagErr.text("");
 
-        const selectedCourseOption = $('input[name="is_Course"]:checked').val();
+        // const selectedCourseOption = $('input[name="is_Course"]:checked').val();
 
-        if (!selectedCourseOption) {
-            courseTagErr.text("Please select whether any course is completed.");
-            err = true;
-        } else if (selectedCourseOption === "yes") {
-            if (!courseTag.val() || !courseTag.val().trim()) {
-                courseTagErr.text("Please enter the course name.");
-                err = true;
-            }
-        }
+        // if (!selectedCourseOption) {
+        //     courseTagErr.text("Please select whether any course is completed.");
+        //     err = true;
+        // } else if (selectedCourseOption === "Yes") {
+        //     if (!courseTag.val() || !courseTag.val().trim()) {
+        //         courseTagErr.text("Please enter the course name.");
+        //         err = true;
+        //     }
+        // }
        if (!err) safeNext(stage);
     }
     // ===== STAGE 6 =====
     else if (stage === 6) {
        
-        const workType = $("#work_type");
-        const workTypeErr = workType.closest(".col-lg-4").find(".error_msg");
+        // const workType = $("#work_type");
+        // const workTypeErr = workType.closest(".col-lg-4").find(".error_msg");
 
-        // ✅ Validate Work Type
-        if (!workType.val()) {
-            workTypeErr.text("Please select Work Type (Fresher or Experience).");
-            err = true;
-        }
+        // // ✅ Validate Work Type
+        // if (!workType.val()) {
+        //     workTypeErr.text("Please select Work Type (Fresher or Experience).");
+        //     err = true;
+        // }
 
-        // ✅ If Experience selected (value = 2)
-        if (workType.val() === "2") {
-            // Validate shifted company fields
-            $(".shiftedCompanyField").each(function () {
-                const input = $(this).find("input");
-                const inputErr = $(this).find(".error_msg");
+        // // ✅ If Experience selected (value = 2)
+        // if (workType.val() === "2") {
+        //     // Validate shifted company fields
+        //     $(".shiftedCompanyField").each(function () {
+        //         const input = $(this).find("input");
+        //         const inputErr = $(this).find(".error_msg");
 
-                if (!input.val().trim()) {
-                    inputErr.text("This field is required.");
-                    err = true;
-                } else {
-                    inputErr.text("");
-                }
-            });
-
-            // Validate each Previous Company Detail row
-            $("#work-exp-wrapper .work-exp-row").each(function (index) {
-                const row = $(this);
-                let rowErr = false;
-
-                // Loop through required inputs
-                row.find("input, textarea").each(function () {
-                    const input = $(this);
-                    const inputErr = input.closest(".mb-3").find(".error_msg");
-
-                    if (!input.val().trim()) {
-                        inputErr.text("This field is required.");
-                        rowErr = true;
-                        err = true;
-                    } else {
-                        inputErr.text("");
-                    }
-                });
-
-                // ✅ Check start < end date
-                const stDate = row.find('input[name="work_st_date[]"]').val().trim();
-                const endDate = row.find('input[name="work_end_date[]"]').val().trim();
-                const endDateErr = row.find('input[name="work_end_date[]"]').closest(".mb-3").find(".error_msg");
-
-                if (stDate && endDate && new Date(stDate) > new Date(endDate)) {
-                    endDateErr.text("End Date must be after Start Date.");
-                    rowErr = true;
-                    err = true;
-                }
-            });
-        }
-
-        // ✅ Validate Document Attachments
-        // $("#document-wrapper .document-row").each(function (index) {
-        //     const docType = $(this).find('select[name="doc_type[]"]');
-        //     const fileInput = $(this).find('input[type="file"]')[0];
-        //     const docTypeErr = docType.closest(".mb-3").find(".error_msg");
-
-        //     if (!docType.val()) {
-        //         docTypeErr.text("Please select a Document Type.");
-        //         err = true;
-        //     } else {
-        //         docTypeErr.text("");
-        //     }
-
-        //     if (fileInput && fileInput.files.length === 0) {
-        //         // Append error message below the dropzone if missing
-        //         const fileErrDiv = $(this).find(".dropzone").next(".error_msg");
-        //         if (fileErrDiv.length) {
-        //             fileErrDiv.text("Please upload a file.");
+        //         if (!input.val().trim()) {
+        //             inputErr.text("This field is required.");
+        //             err = true;
         //         } else {
-        //             $(this).find(".dropzone").after('<div class="text-danger error_msg">Please upload a file.</div>');
+        //             inputErr.text("");
         //         }
-        //         err = true;
-        //     }
-        // });
+        //     });
+
+        //     // Validate each Previous Company Detail row
+        //     $("#work-exp-wrapper .work-exp-row").each(function (index) {
+        //         const row = $(this);
+        //         let rowErr = false;
+
+        //         // Loop through required inputs
+        //         row.find("input, textarea").each(function () {
+        //             const input = $(this);
+        //             const inputErr = input.closest(".mb-3").find(".error_msg");
+
+        //             if (!input.val().trim()) {
+        //                 inputErr.text("This field is required.");
+        //                 rowErr = true;
+        //                 err = true;
+        //             } else {
+        //                 inputErr.text("");
+        //             }
+        //         });
+
+        //         // ✅ Check start < end date
+        //         const stDate = row.find('input[name="work_st_date[]"]').val().trim();
+        //         const endDate = row.find('input[name="work_end_date[]"]').val().trim();
+        //         const endDateErr = row.find('input[name="work_end_date[]"]').closest(".mb-3").find(".error_msg");
+
+        //         if (stDate && endDate && new Date(stDate) > new Date(endDate)) {
+        //             endDateErr.text("End Date must be after Start Date.");
+        //             rowErr = true;
+        //             err = true;
+        //         }
+        //     });
+        // }
+
+        // // ✅ Validate Document Attachments
+        // // $("#document-wrapper .document-row").each(function (index) {
+        // //     const docType = $(this).find('select[name="doc_type[]"]');
+        // //     const fileInput = $(this).find('input[type="file"]')[0];
+        // //     const docTypeErr = docType.closest(".mb-3").find(".error_msg");
+
+        // //     if (!docType.val()) {
+        // //         docTypeErr.text("Please select a Document Type.");
+        // //         err = true;
+        // //     } else {
+        // //         docTypeErr.text("");
+        // //     }
+
+        // //     if (fileInput && fileInput.files.length === 0) {
+        // //         // Append error message below the dropzone if missing
+        // //         const fileErrDiv = $(this).find(".dropzone").next(".error_msg");
+        // //         if (fileErrDiv.length) {
+        // //             fileErrDiv.text("Please upload a file.");
+        // //         } else {
+        // //             $(this).find(".dropzone").after('<div class="text-danger error_msg">Please upload a file.</div>');
+        // //         }
+        // //         err = true;
+        // //     }
+        // // });
 
 
         if (!err){
@@ -2906,236 +2887,236 @@
     // ===== STAGE 7 =====
     else if (stage === 7) {
         
-        // Get the selected company type (Management or Business)
-            const selectedCompanyType = $('input[name="company"]:checked').val();
+        // // Get the selected company type (Management or Business)
+        //     const selectedCompanyType = $('input[name="company"]:checked').val();
 
             
-            const management_depart = $("#management_depart");
-            const management_division = $("#management_division");
-            const management_job_role = $("#management_job_role");
-            const staffCompany = $("#staff_company_name");
-            const entity_name = $("#entity_name");
-            const business_depart = $("#business_depart");
-            const business_division = $("#business_division");
-            const business_job_role = $("#business_job_role");
-            const loginuser_name = $("#loginuser_name");
-            const loginpassword = $("#loginpassword");
+        //     const management_depart = $("#management_depart");
+        //     const management_division = $("#management_division");
+        //     const management_job_role = $("#management_job_role");
+        //     const staffCompany = $("#staff_company_name");
+        //     const entity_name = $("#entity_name");
+        //     const business_depart = $("#business_depart");
+        //     const business_division = $("#business_division");
+        //     const business_job_role = $("#business_job_role");
+        //     const loginuser_name = $("#loginuser_name");
+        //     const loginpassword = $("#loginpassword");
 
-            const manageDepartErr = management_depart.closest(".err-chk").find(".error_msg");
-            const managementDivisionErr = management_division.closest(".err-chk").find(".error_msg");
-            const managementJobRoleErr = management_job_role.closest(".err-chk").find(".error_msg");
-            const staffCompanyErr = staffCompany.closest(".mb-3").find(".error_msg");
-            const entityNameErr = entity_name.closest(".mb-3").find(".error_msg");
-            const businessDepartErr = business_depart.closest(".err-chk").find(".error_msg");
-            const businessDivisionErr = business_division.closest(".err-chk").find(".error_msg");
-            const businessJobRoleErr = business_job_role.closest(".err-chk").find(".error_msg");
-            const loginUserNameErr = loginuser_name.closest(".err-chk").find(".error_msg");
-            const loginPasswordErr = loginpassword.closest(".err-chk").find(".error_msg");
+        //     const manageDepartErr = management_depart.closest(".err-chk").find(".error_msg");
+        //     const managementDivisionErr = management_division.closest(".err-chk").find(".error_msg");
+        //     const managementJobRoleErr = management_job_role.closest(".err-chk").find(".error_msg");
+        //     const staffCompanyErr = staffCompany.closest(".mb-3").find(".error_msg");
+        //     const entityNameErr = entity_name.closest(".mb-3").find(".error_msg");
+        //     const businessDepartErr = business_depart.closest(".err-chk").find(".error_msg");
+        //     const businessDivisionErr = business_division.closest(".err-chk").find(".error_msg");
+        //     const businessJobRoleErr = business_job_role.closest(".err-chk").find(".error_msg");
+        //     const loginUserNameErr = loginuser_name.closest(".err-chk").find(".error_msg");
+        //     const loginPasswordErr = loginpassword.closest(".err-chk").find(".error_msg");
 
             
-            // Clear any previous error messages
-            manageDepartErr.text(""); 
-            managementDivisionErr.text(""); 
-            managementJobRoleErr.text(""); 
-            staffCompanyErr.text("");
-            entityNameErr.text("");
-            businessDepartErr.text(""); 
-            businessDivisionErr.text(""); 
-            businessJobRoleErr.text(""); 
-            loginUserNameErr.text(""); 
-            loginPasswordErr.text(""); 
+        //     // Clear any previous error messages
+        //     manageDepartErr.text(""); 
+        //     managementDivisionErr.text(""); 
+        //     managementJobRoleErr.text(""); 
+        //     staffCompanyErr.text("");
+        //     entityNameErr.text("");
+        //     businessDepartErr.text(""); 
+        //     businessDivisionErr.text(""); 
+        //     businessJobRoleErr.text(""); 
+        //     loginUserNameErr.text(""); 
+        //     loginPasswordErr.text(""); 
 
 
-            if (selectedCompanyType == 1) {
-                // For Management: Validate the Department field
-                if (!management_depart.val() || !management_depart.val().trim()) {
-                    manageDepartErr.text("Department is Required.");
-                    err = true;  
-                } 
-                if (!management_division.val() || !management_division.val().trim()) {
-                    managementDivisionErr.text("Division is Required.");
-                    err = true;  
-                } 
-                if (!management_job_role.val() || !management_job_role.val().trim()) {
-                    managementJobRoleErr.text("Job Role is Required.");
-                    err = true; 
-                } 
+        //     if (selectedCompanyType == 1) {
+        //         // For Management: Validate the Department field
+        //         if (!management_depart.val() || !management_depart.val().trim()) {
+        //             manageDepartErr.text("Department is Required.");
+        //             err = true;  
+        //         } 
+        //         if (!management_division.val() || !management_division.val().trim()) {
+        //             managementDivisionErr.text("Division is Required.");
+        //             err = true;  
+        //         } 
+        //         if (!management_job_role.val() || !management_job_role.val().trim()) {
+        //             managementJobRoleErr.text("Job Role is Required.");
+        //             err = true; 
+        //         } 
 
-            } else {
-                // For Business: Validate the Company Name field
-                if (!staffCompany.val() || staffCompany.val().trim() === '') {
-                    staffCompanyErr.text("Company is Required.");
-                    err = true;  
-                } 
-                if (!entity_name.val() || entity_name.val().trim() === '') {
-                    entityNameErr.text("Entity is Required.");
-                    err = true;  
-                } 
-                if (!business_depart.val() || business_depart.val().trim() === '') {
-                    businessDepartErr.text("Department is Required.");
-                    err = true;  
-                } 
-                if (!business_division.val() || business_division.val().trim() === '') {
-                    businessDivisionErr.text("Division is Required.");
-                    err = true;  
-                } 
-                if (!business_job_role.val() || business_job_role.val().trim() === '') {
-                    businessJobRoleErr.text("Job Role is Required.");
-                    err = true;  
-                } 
-            }
+        //     } else {
+        //         // For Business: Validate the Company Name field
+        //         if (!staffCompany.val() || staffCompany.val().trim() === '') {
+        //             staffCompanyErr.text("Company is Required.");
+        //             err = true;  
+        //         } 
+        //         if (!entity_name.val() || entity_name.val().trim() === '') {
+        //             entityNameErr.text("Entity is Required.");
+        //             err = true;  
+        //         } 
+        //         if (!business_depart.val() || business_depart.val().trim() === '') {
+        //             businessDepartErr.text("Department is Required.");
+        //             err = true;  
+        //         } 
+        //         if (!business_division.val() || business_division.val().trim() === '') {
+        //             businessDivisionErr.text("Division is Required.");
+        //             err = true;  
+        //         } 
+        //         if (!business_job_role.val() || business_job_role.val().trim() === '') {
+        //             businessJobRoleErr.text("Job Role is Required.");
+        //             err = true;  
+        //         } 
+        //     }
 
-            // Check other fields like Pseudo Name, Date of Joining, Basic Salary, Per Hour Cost, etc.
-            const pseudo_name = $("#pseudo_name");
-            const pseudoNameErr = pseudo_name.closest(".mb-3").find(".error_msg");
-            pseudoNameErr.text("");
+        //     // Check other fields like Pseudo Name, Date of Joining, Basic Salary, Per Hour Cost, etc.
+        //     const pseudo_name = $("#pseudo_name");
+        //     const pseudoNameErr = pseudo_name.closest(".mb-3").find(".error_msg");
+        //     pseudoNameErr.text("");
 
-            if (!pseudo_name.val().trim()) {
-                 pseudoNameErr.text('Pseudo Name is required');
-                err = true;
-            }
+        //     if (!pseudo_name.val().trim()) {
+        //          pseudoNameErr.text('Pseudo Name is required');
+        //         err = true;
+        //     }
 
-            const staff_doj = $("#staff_doj");
-            const dojErr = staff_doj.closest(".mb-3").find(".error_msg");
-            dojErr.text("");
+        //     const staff_doj = $("#staff_doj");
+        //     const dojErr = staff_doj.closest(".mb-3").find(".error_msg");
+        //     dojErr.text("");
 
-            if (!staff_doj.val()) {
-                dojErr.text("Date of Joining is Required.");
-                err = true;
-            }
+        //     if (!staff_doj.val()) {
+        //         dojErr.text("Date of Joining is Required.");
+        //         err = true;
+        //     }
 
-            const basic_salary = $("#basic_salary");
-            const basicSalaryErr = basic_salary.siblings(".error_msg");
-            basicSalaryErr.text("");
+        //     const basic_salary = $("#basic_salary");
+        //     const basicSalaryErr = basic_salary.siblings(".error_msg");
+        //     basicSalaryErr.text("");
 
-            if (!basic_salary.val().trim()) {
-                basicSalaryErr.text("Basic Salary is Required.");
-                err = true;
-            }
+        //     if (!basic_salary.val().trim()) {
+        //         basicSalaryErr.text("Basic Salary is Required.");
+        //         err = true;
+        //     }
 
-            const per_hr_cost = $("#per_hr_cost");
-            const perHrCostErr = per_hr_cost.siblings(".error_msg");
-            perHrCostErr.text("");
+        //     const per_hr_cost = $("#per_hr_cost");
+        //     const perHrCostErr = per_hr_cost.siblings(".error_msg");
+        //     perHrCostErr.text("");
 
-            if (!per_hr_cost.val().trim()) {
-                perHrCostErr.text("Per Hour Cost is Required.");
-                err = true;
-            }
+        //     if (!per_hr_cost.val().trim()) {
+        //         perHrCostErr.text("Per Hour Cost is Required.");
+        //         err = true;
+        //     }
 
-            const skill_tag = $("#skill_tag");
-            const skillTagErr = skill_tag.siblings(".error_msg");
-            skillTagErr.text("");
+        //     const skill_tag = $("#skill_tag");
+        //     const skillTagErr = skill_tag.siblings(".error_msg");
+        //     skillTagErr.text("");
 
-            if (!skill_tag.val().trim()) {
-                skillTagErr.text("Skill Tag is Required.");
-                err = true;
-            }
+        //     if (!skill_tag.val().trim()) {
+        //         skillTagErr.text("Skill Tag is Required.");
+        //         err = true;
+        //     }
 
-               if (!loginuser_name.val() || loginuser_name.val().trim() === '') {
-                    loginUserNameErr.text("Username is Required.");
-                    err = true;  
-                } 
-                if (!loginpassword.val() || loginpassword.val().trim() === '') {
-                    loginPasswordErr.text("Password is Required.");
-                    err = true;  
-                } 
+        //        if (!loginuser_name.val() || loginuser_name.val().trim() === '') {
+        //             loginUserNameErr.text("Username is Required.");
+        //             err = true;  
+        //         } 
+        //         if (!loginpassword.val() || loginpassword.val().trim() === '') {
+        //             loginPasswordErr.text("Password is Required.");
+        //             err = true;  
+        //         } 
         if (!err) safeNext(stage);
     }
     // ===== STAGE 8 =====
     else if (stage === 8) {
       
-            const applied_position = $("#applied_position");
-            const source_id = $("#source_id");
-            const interview_company = $("#interview_company");
+            // const applied_position = $("#applied_position");
+            // const source_id = $("#source_id");
+            // const interview_company = $("#interview_company");
 
-            const appliedPostionErr = applied_position.closest(".err-chk").find(".error_msg");
-            const sourceIdErr = source_id.closest(".err-chk").find(".error_msg");
-            const intervCompErr = interview_company.closest(".err-chk").find(".error_msg");
+            // const appliedPostionErr = applied_position.closest(".err-chk").find(".error_msg");
+            // const sourceIdErr = source_id.closest(".err-chk").find(".error_msg");
+            // const intervCompErr = interview_company.closest(".err-chk").find(".error_msg");
 
-            // 🔹 Clear previous error messages
-            $(".error_msg").text("");
+            // // 🔹 Clear previous error messages
+            // $(".error_msg").text("");
 
-            // 🔹 Validate main fields
-            if (!applied_position.val() || applied_position.val().length === 0) {
-                appliedPostionErr.text("Position is required.");
-                err = true;
-            }
-            if (!source_id.val() || source_id.val().trim() === "") {
-                sourceIdErr.text("Source is required.");
-                err = true;
-            }
-            if (!interview_company.val() || interview_company.val().length === 0) {
-                intervCompErr.text("Company is required.");
-                err = true;
-            }
+            // // 🔹 Validate main fields
+            // if (!applied_position.val() || applied_position.val().length === 0) {
+            //     appliedPostionErr.text("Position is required.");
+            //     err = true;
+            // }
+            // if (!source_id.val() || source_id.val().trim() === "") {
+            //     sourceIdErr.text("Source is required.");
+            //     err = true;
+            // }
+            // if (!interview_company.val() || interview_company.val().length === 0) {
+            //     intervCompErr.text("Company is required.");
+            //     err = true;
+            // }
 
-            // 🔹 Validate both dynamic and dependent questions
-            $(".dynamic-question, .dependent-question:not(.d-none)").each(function () {
-                const label = $(this).find("label").first().text().trim();
-                const hasMandatory = $(this).find("span.text-danger").length > 0;
-                if (!hasMandatory) return; // skip non-mandatory
+            // // 🔹 Validate both dynamic and dependent questions
+            // $(".dynamic-question, .dependent-question:not(.d-none)").each(function () {
+            //     const label = $(this).find("label").first().text().trim();
+            //     const hasMandatory = $(this).find("span.text-danger").length > 0;
+            //     if (!hasMandatory) return; // skip non-mandatory
 
-                const field = $(this).find(".hrq-field, input, textarea, select").first();
-                const fieldType = field.attr("type") || field.prop("tagName").toLowerCase();
+            //     const field = $(this).find(".hrq-field, input, textarea, select").first();
+            //     const fieldType = field.attr("type") || field.prop("tagName").toLowerCase();
 
-                let value = null;
-                let isValid = true;
+            //     let value = null;
+            //     let isValid = true;
 
-                // --- Text field ---
-                if (fieldType === "text") {
-                    value = field.val().trim();
-                    if (!value) isValid = false;
-                }
+            //     // --- Text field ---
+            //     if (fieldType === "text") {
+            //         value = field.val().trim();
+            //         if (!value) isValid = false;
+            //     }
 
-                // --- Text area ---
-                else if (fieldType === "textarea") {
-                    value = field.val().trim();
-                    if (!value) isValid = false;
-                }
+            //     // --- Text area ---
+            //     else if (fieldType === "textarea") {
+            //         value = field.val().trim();
+            //         if (!value) isValid = false;
+            //     }
 
-                // --- Date field ---
-                else if (fieldType === "date") {
-                    value = field.val().trim();
-                    if (!value) isValid = false;
-                }
+            //     // --- Date field ---
+            //     else if (fieldType === "date") {
+            //         value = field.val().trim();
+            //         if (!value) isValid = false;
+            //     }
 
-                // --- Radio buttons ---
-                else if (fieldType === "radio") {
-                    const name = field.attr("name");
-                    if (!$(`input[name='${name}']:checked`).length) isValid = false;
-                }
+            //     // --- Radio buttons ---
+            //     else if (fieldType === "radio") {
+            //         const name = field.attr("name");
+            //         if (!$(`input[name='${name}']:checked`).length) isValid = false;
+            //     }
 
-                // --- Checkboxes ---
-                else if (fieldType === "checkbox") {
-                    const name = field.attr("name");
-                    if (!$(`input[name='${name}[]']:checked`).length) isValid = false;
-                }
+            //     // --- Checkboxes ---
+            //     else if (fieldType === "checkbox") {
+            //         const name = field.attr("name");
+            //         if (!$(`input[name='${name}[]']:checked`).length) isValid = false;
+            //     }
 
-                // --- Select (list_box) ---
-                else if (field.prop("tagName").toLowerCase() === "select") {
-                    value = field.val();
-                    if (!value || value === "") isValid = false;
-                }
+            //     // --- Select (list_box) ---
+            //     else if (field.prop("tagName").toLowerCase() === "select") {
+            //         value = field.val();
+            //         if (!value || value === "") isValid = false;
+            //     }
 
-                // --- File (multiple_images) ---
-                else if (fieldType === "file") {
-                    const files = field[0].files;
-                    if (!files || files.length === 0) isValid = false;
-                }
+            //     // --- File (multiple_images) ---
+            //     else if (fieldType === "file") {
+            //         const files = field[0].files;
+            //         if (!files || files.length === 0) isValid = false;
+            //     }
 
-                // --- Show error if invalid ---
-                if (!isValid) {
-                    err = true;
-                    let errorBox = $(this).find(".error_msg");
-                    if (errorBox.length === 0) {
-                        $(this).append('<div class="text-danger error_msg"></div>');
-                        errorBox = $(this).find(".error_msg");
-                    }
-                    errorBox.text(`${label.replace("*", "").trim()} is required.`);
-                } else {
-                    $(this).find(".error_msg").text(""); // clear old error
-                }
-            });
+            //     // --- Show error if invalid ---
+            //     if (!isValid) {
+            //         err = true;
+            //         let errorBox = $(this).find(".error_msg");
+            //         if (errorBox.length === 0) {
+            //             $(this).append('<div class="text-danger error_msg"></div>');
+            //             errorBox = $(this).find(".error_msg");
+            //         }
+            //         errorBox.text(`${label.replace("*", "").trim()} is required.`);
+            //     } else {
+            //         $(this).find(".error_msg").text(""); // clear old error
+            //     }
+            // });
 
 
 
@@ -3667,7 +3648,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
         }
-        //   Route::get('/get_job_role', [Division::class, 'JobPostionList'])->name('get_job_role');
     </script>
     
 @endsection
