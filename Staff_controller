@@ -1,0 +1,670 @@
+<?php
+
+namespace App\Http\Controllers\hr_management\hr_enroll;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\SocialMediaModel;
+use App\Models\DepartmentModel;
+use App\Models\QualificationModel;
+use App\Models\LanguageModel;
+use App\Models\JobpositionModel;
+use App\Models\SourceModel;
+use App\Models\CompanyModel;
+use App\Models\DocumentModel;
+use App\Models\DocumentCheckListModel;
+use App\Models\StaffModel;
+use App\Models\HrQuestionnaireModel;
+use App\Models\HrQuestionDependsModel;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+
+class ManageStaff extends Controller
+{
+  public function index()
+  {
+     $company_list = CompanyModel::where('status', 0)->orderBy('sno', 'ASC')->get();
+     
+    return view('content.hr_management.hr_enroll.manage_staff.staff_list',[
+        'company_list' => $company_list,
+        ]);
+  }
+  
+   public function AddOldStaff(Request $request)
+  {
+
+  
+    // Validate incoming request
+    $validator = Validator::make($request->all(), [
+      'staff_data_payload' => 'required'
+    ]);
+
+    if ($validator->fails()) {
+      return response()->json([
+        'status' => 401,
+        'message' => 'Incorrect format input fields',
+        'error_msg' => $validator->errors()->all(),
+        'data' => null,
+      ], 200);
+    }
+
+    $user_id = $request->user()->user_id;
+    
+    $company_type=2;
+    $company_id=$request->staff_company_name;
+    $entity_id=$request->staff_entity_name;
+    $branch_id=$request->staff_branch_name;
+   $staffData = json_decode($request->staff_data_payload, true); 
+    //   return $staffData;
+    foreach($staffData as $staff){
+       
+        $staff_check = StaffModel::where('company_id', $company_id)->orderBy('sno', 'desc')->first();
+        $sno = $staff_check ? $staff_check->sno + 1 : 1;
+       $staff_id = sprintf("EGC%02d%03d", $company_id, $sno);
+       
+        // Handle staff image upload
+        $staff_image_url = $staff['staff_image'] ?? null;
+        $staff_image = null;
+
+        if ($staff_image_url) {
+            // Determine file extension
+            $ext = pathinfo(parse_url($staff_image_url, PHP_URL_PATH), PATHINFO_EXTENSION);
+            if (!$ext) {
+                $ext = 'jpg';
+            }
+
+            // Define target folder
+            $folderPath = public_path("staff_images/Buisness/{$company_id}/{$entity_id}");
+
+            // Ensure the folder exists
+            if (!File::exists($folderPath)) {
+                File::makeDirectory($folderPath, 0777, true, true);
+            }
+            return $folderPath;
+            // ✅ Find the next available image number in this folder
+            $existingFiles = File::files($folderPath);
+            $maxNumber = 0;
+
+            foreach ($existingFiles as $file) {
+                // Match filenames like staff_image_5.jpg
+                if (preg_match('/staff_image_(\d+)\./', $file->getFilename(), $matches)) {
+                    $num = (int) $matches[1];
+                    if ($num > $maxNumber) {
+                        $maxNumber = $num;
+                    }
+                }
+            }
+
+            // Next available number
+            $nextNumber = $maxNumber + 1;
+
+            // Create new filename
+            $staff_image_name = "staff_image_{$nextNumber}.{$ext}";
+            $savePath = $folderPath . '/' . $staff_image_name;
+
+            // Download and save the image
+            try {
+                $imageData = @file_get_contents($staff_image_url);
+                if ($imageData !== false) {
+                    file_put_contents($savePath, $imageData);
+                    $staff_image = $staff_image_name;
+                } else {
+                    $staff_image = null;
+                }
+            } catch (Exception $e) {
+                $staff_image = null;
+            }
+        }
+
+
+
+    // Create new staff record
+    $add_staff = new StaffModel();
+    $add_staff->staff_id = $staff_id;
+    $add_staff->company_id = $company_id;
+    $add_staff->entity_id = $entity_id;
+    $add_staff->branch_id = $branch_id;
+    $add_staff->sub_department_id = $request->division_id ?? 0;
+    $add_staff->department_id = $request->department_id ?? 0;
+    $add_staff->role_id = $request->role_id;
+    $add_staff->exp_type = $request->staff_type;
+    $add_staff->staff_name = $request->staff_name;
+    $add_staff->mobile_no = $request->mobile_no;
+    $add_staff->alternative_no = $request->alternative_no;
+    $add_staff->email_id = $request->email_id;
+    $add_staff->gender = $request->gender;
+    $add_staff->dob = date('Y-m-d', strtotime($request->dob));
+    $add_staff->date_of_joining = date('Y-m-d', strtotime($request->date_of_joinig));
+    $add_staff->contact_person_name = $request->contact_person_name;
+    $add_staff->contact_person_no = $request->contact_person_no;
+    $add_staff->martial_status = $request->martial_status ?? null;
+    $add_staff->address = $request->address ?? null;
+    $add_staff->staff_image = $staff_image ?? null;
+    $add_staff->attachment = json_encode($attachments) ?? null;
+    $add_staff->nick_name = $request->nick_name ?? null;
+    $add_staff->position_role = $request->position_role ?? null;
+    $add_staff->description = $request->description ?? null;
+    $add_staff->basic_salary = $request->salary ?? null;
+    $add_staff->per_hour_cost = $request->hour_cost ?? null;
+    $add_staff->login_access = $request->login_access ?? 0;
+    $login_access = $request->login_access ?? 0;
+    $add_staff->employee_skill_id = $request->employee_skill;
+    if ($login_access == 1) {
+      $add_staff->user_name = $request->loginuser_name;
+      $add_staff->password  = $request->loginpassword;
+    } else {
+      $add_staff->user_name = '';
+      $add_staff->password  = '';
+    }
+    $add_staff->created_by = $request->user()->user_id;
+    $add_staff->updated_by = $request->user()->user_id;
+
+    $add_staff->save();
+    // return $add_staff->sno;
+    if ($add_staff) {
+      // Add User for login credentials
+      $login_access = $request->login_access;
+      if ($login_access == 1) {
+        User::create([
+          'user_id' => $add_staff->sno,
+          'role_id' => $request->role_id ?? 0,
+          'branch_id' =>  $request->auth_branch_id,
+          'entity_id' => $request->user()->entity_id,
+          'name' => $request->loginuser_name,
+          'password' => Hash::make($request->loginpassword),
+          'email' => $request->email_id,
+          'created_by' => $request->user()->user_id ?? 1,
+          'updated_by' => $request->user()->user_id ?? 1,
+        ]);
+      }
+
+
+      // Handle work information
+      if ($request->staff_type == 2) {
+        $positions = $request->input('position_') ?? [];
+        foreach ($positions as $key => $position) {
+          StaffWorkInfoModel::create([
+            'staff_id' => $add_staff->sno,
+            'staff_type' => $request->staff_type,
+            'position' => $position,
+            'year_of_experience' => $request->input("year_of_experience_")[$key] ?? 0,
+            'company_name' => $request->input("company_name_")[$key],
+            'work_start_date' => $request->input("exper_srt_date_")[$key] ? date('Y-m-d', strtotime($request->input("exper_srt_date_")[$key])) : null,
+            'work_end_date' => $request->input("exper_end_date_")[$key] ? date('Y-m-d', strtotime($request->input("exper_end_date_")[$key])) : null,
+            'created_by' => $request->user()->user_id,
+            'updated_by' => $request->user()->user_id,
+          ]);
+        }
+      }
+      // Handle staff credentials
+
+
+      session()->flash('toastr', [
+        'type' => 'success',
+        'message' => 'Staff added Successfully!'
+      ]);
+    } 
+        
+    }
+    
+    // return $request;
+    // Determine staff serial number
+    $staff_check = StaffModel::where('status', '!=', 2)->orderBy('sno', 'desc')->first();
+    $sno = $staff_check ? $staff_check->sno + 1 : 1;
+
+    // Handle staff image upload
+    $staff_image = '';
+    if ($request->hasFile('staff_add_icon')) {
+      $staff_imageName = 'staff_' . $sno . '.' . $request->file('staff_add_icon')->extension();
+      $request->file('staff_add_icon')->move(public_path('staff_images'), $staff_imageName);
+      $staff_image = $staff_imageName;
+    }
+
+    // Handle attachments
+    $attachments = [];
+    if ($request->hasFile('attachment')) {
+      foreach ($request->file('attachment') as $file) {
+        $attachmentName = 'attachment_' . $sno . '_' . $file->getClientOriginalName();
+        $file->move(public_path('staff_attachments/staff_' . $sno), $attachmentName);
+        $attachments[] = $attachmentName;
+      }
+    }
+
+    // Generate staff ID
+    $year = substr(date("y"), -2);
+    $staff_id = sprintf("SF-%04d/%s", $sno, $year);
+
+    // return json_encode($request->KnowledgeTag);
+    $access_bran = $request->acces_branch_id ?? [];
+    $access_fra  = $request->acces_franchise_id ?? [];
+    // Combine the two arrays
+    $access_multi = array_merge($access_bran, $access_fra);
+    $bran_multi   = json_encode($access_multi);
+
+    // Create new staff record
+    $add_staff = new StaffModel();
+    $add_staff->staff_id = $staff_id;
+    $add_staff->branch_id = $request->auth_branch_id;
+    $add_staff->shift_time_id = $request->shift_time;
+    $add_staff->multi_branch_access    = $bran_multi ?? '';
+    $add_staff->sub_department_id = $request->division_id ?? 0;
+    $add_staff->department_id = $request->department_id ?? 0;
+    $add_staff->role_id = $request->role_id;
+    $add_staff->exp_type = $request->staff_type;
+    $add_staff->staff_name = $request->staff_name;
+    $add_staff->mobile_no = $request->mobile_no;
+    $add_staff->alternative_no = $request->alternative_no;
+    $add_staff->email_id = $request->email_id;
+    $add_staff->gender = $request->gender;
+    $add_staff->dob = date('Y-m-d', strtotime($request->dob));
+    $add_staff->date_of_joining = date('Y-m-d', strtotime($request->date_of_joinig));
+    $add_staff->contact_person_name = $request->contact_person_name;
+    $add_staff->contact_person_no = $request->contact_person_no;
+    $add_staff->martial_status = $request->martial_status ?? null;
+    $add_staff->address = $request->address ?? null;
+    $add_staff->staff_image = $staff_image ?? null;
+    $add_staff->attachment = json_encode($attachments) ?? null;
+    $add_staff->nick_name = $request->nick_name ?? null;
+    $add_staff->position_role = $request->position_role ?? null;
+    $add_staff->description = $request->description ?? null;
+    $add_staff->basic_salary = $request->salary ?? null;
+    $add_staff->per_hour_cost = $request->hour_cost ?? null;
+    $add_staff->login_access = $request->login_access ?? 0;
+    $login_access = $request->login_access ?? 0;
+    $add_staff->employee_skill_id = $request->employee_skill;
+    if ($login_access == 1) {
+      $add_staff->user_name = $request->loginuser_name;
+      $add_staff->password  = $request->loginpassword;
+    } else {
+      $add_staff->user_name = '';
+      $add_staff->password  = '';
+    }
+    $add_staff->created_by = $request->user()->user_id;
+    $add_staff->updated_by = $request->user()->user_id;
+
+    $add_staff->save();
+    // return $add_staff->sno;
+    if ($add_staff) {
+      // Add User for login credentials
+      $login_access = $request->login_access;
+      if ($login_access == 1) {
+        User::create([
+          'user_id' => $add_staff->sno,
+          'role_id' => $request->role_id ?? 0,
+          'branch_id' =>  $request->auth_branch_id,
+          'entity_id' => $request->user()->entity_id,
+          'name' => $request->loginuser_name,
+          'password' => Hash::make($request->loginpassword),
+          'email' => $request->email_id,
+          'created_by' => $request->user()->user_id ?? 1,
+          'updated_by' => $request->user()->user_id ?? 1,
+        ]);
+      }
+
+
+      // Handle work information
+      if ($request->staff_type == 2) {
+        $positions = $request->input('position_') ?? [];
+        foreach ($positions as $key => $position) {
+          StaffWorkInfoModel::create([
+            'staff_id' => $add_staff->sno,
+            'staff_type' => $request->staff_type,
+            'position' => $position,
+            'year_of_experience' => $request->input("year_of_experience_")[$key] ?? 0,
+            'company_name' => $request->input("company_name_")[$key],
+            'work_start_date' => $request->input("exper_srt_date_")[$key] ? date('Y-m-d', strtotime($request->input("exper_srt_date_")[$key])) : null,
+            'work_end_date' => $request->input("exper_end_date_")[$key] ? date('Y-m-d', strtotime($request->input("exper_end_date_")[$key])) : null,
+            'created_by' => $request->user()->user_id,
+            'updated_by' => $request->user()->user_id,
+          ]);
+        }
+      }
+      // Handle staff credentials
+
+
+      session()->flash('toastr', [
+        'type' => 'success',
+        'message' => 'Staff added Successfully!'
+      ]);
+    } else {
+      session()->flash('toastr', [
+        'type' => 'error',
+        'message' => 'Could not add the Staff !'
+      ]);
+    }
+    return redirect('hr_management/staff');
+  }
+
+  public function staff_add()
+  {
+     $company_list = CompanyModel::where('status', 0)->orderBy('sno', 'ASC')->get();
+     $source_list = SourceModel::where('status', 0)->orderBy('sno', 'ASC')->get();
+     $jobPositionlist = JobpositionModel::where('status', 0)->orderBy('sno', 'ASC')->get();
+     $documentTypeList = DocumentModel::where('status', 0)->orderBy('sno', 'ASC')->get();
+     $documentCheckList = DocumentCheckListModel::where('status', 0)->orderBy('sno', 'ASC')->get();
+     $qualificationList = QualificationModel::where('status', 0)->orderBy('sno', 'ASC')->get();
+     $languageList = LanguageModel::where('status', 0)->orderBy('sno', 'ASC')->get();
+     $management_department = DepartmentModel::where('status', 0)->where('company_type',1)->orderBy('sno', 'ASC')->get();
+     $social_media_list = SocialMediaModel::where('status', 0)->orderBy('sno', 'ASC')->get();
+     $questions = HrQuestionnaireModel::with(['depends' => function($q) {
+        $q->where('status', 0);
+    }])->where('status', 0)->get();
+    return view('content.hr_management.hr_enroll.manage_staff.add_staff',[
+        'social_media_list' => $social_media_list,
+        'company_list' => $company_list,
+        'source_list' => $source_list,
+        'documentTypeList' => $documentTypeList,
+        'jobPositionlist' => $jobPositionlist,
+        'qualificationList' => $qualificationList,
+        'languageList' => $languageList,
+        'management_department' => $management_department,
+        'documentCheckList' => $documentCheckList,
+        'questions' => $questions
+        ]);
+  }
+
+  public function Add(Request $request)
+  {
+
+    return $request;
+    // Validate incoming request
+    $validator = Validator::make($request->all(), [
+      'staff_name' => 'required|max:255'
+    ]);
+
+    if ($validator->fails()) {
+      return response()->json([
+        'status' => 401,
+        'message' => 'Incorrect format input fields',
+        'error_msg' => $validator->errors()->all(),
+        'data' => null,
+      ], 200);
+    }
+
+    $user_id = $request->user()->user_id;
+    // return $request;
+    // Determine staff serial number
+   
+
+      $company_type = $request->company ?? 1;
+      $company_id   = $request->staff_company_name ?? 0;
+      $entity_id    = $request->entity_name ?? 0;
+       $staff_check = StaffModel::where('company_type',1)->where('status', '!=', 2)->orderBy('sno', 'desc')->first();
+       $sno = $staff_check ? $staff_check->sno + 1 : 1;
+    
+      // Generate staff ID
+      if ($company_type == 1) {
+          // Example: EGC01001, EGC01002 ...
+          $staff_id = sprintf("EGC01%03d", $sno);
+      } elseif ($company_type == 2) {
+         $staff_company_check = StaffModel::where('company_id',$company_id)->where('status', '!=', 2)->orderBy('sno', 'desc')->first();
+           $company_sno =$staff_company_check ? $staff_company_check->sno + 1 : 1;
+          $prefix_num = 1 + (int)$company_id; // company_id=1→2, company_id=2→3
+          $staff_id = sprintf("EGC%02d%03d", $prefix_num, $company_sno);
+      } else {
+          // Default / fallback
+          $staff_id = sprintf("EGC01%03d", $sno);
+      }
+
+
+    // Stage 1 Base Details
+    // Handle staff image upload
+    $staff_image = '';
+    if ($request->hasFile('staff_add_icon')) {
+      $staff_imageName = 'staff_' . $sno . '.' . $request->file('staff_add_icon')->extension();
+      $request->file('staff_add_icon')->move(public_path('staff_images'), $staff_imageName);
+      $staff_image = $staff_imageName;
+    }
+
+    $staff_name = $request->staff_name;
+    $mobile_no = $request->mobile_no;
+    $gender = $request->gender ?? 1;
+    $dob = $request->dob ? date('Y-m-d', strtotime($request->dob)) : NULL;
+    $email_id = $request->email_id ?? NULL;
+    $mother_tongue = $request->mother_tongue ?? NULL;
+    $languages = $request->Languages ? json_encode($request->Languages) : NULL;
+    $hobby = $request->hobby ?? NULL;
+    $description = $request->description ?? NULL;
+
+    // Stage 2 Family Details
+      $father_name = $request->father_name;
+      $father_occup = $request->father_occup;
+      $mother_name = $request->mother_name ?? NULL;
+      $mother_occup = $request->mother_occup ?? NULL;
+      $marital_status = $request->marital_status ?? 2;
+      $anniversary_date = $request->anniversary_date ? date('Y-m-d', strtotime($request->anniversary_date)) : NULL;
+      $spouse_name = $request->spouse_name ?? NULL;
+      $spouse_mobile = $request->spouse_mobile ?? NULL;
+      $spouse_dob = $request->spouse_dob ? date('Y-m-d', strtotime($request->spouse_dob)) : NULL;
+      $spouse_designation = $request->spouse_designation ?? NULL;
+      $spouse_company_name = $request->spouse_company_name ?? NULL;
+      $spouse_salary = $request->spouse_salary ?? NULL;
+      $has_children = $request->has_children ?? NULL;
+      $childrenCount = $request->childrenCount ?? 0;
+      $child_name = $request->child_name ? json_encode($request->child_name) : NULL;
+      $child_dob = $request->child_dob ? json_encode($request->child_dob) : NULL;
+      $child_std = $request->child_std ? json_encode($request->child_std) : NULL;
+      $child_year = $request->child_year ? json_encode($request->child_year) : NULL;
+      $has_Siblings = $request->has_Siblings ?? 0;
+      $siblings_detail = $request->siblings_detail ?? Null;
+
+    // Stage 3 Contact Details
+    
+
+
+    // Handle attachments
+    $attachments = [];
+    if ($request->hasFile('attachment')) {
+      foreach ($request->file('attachment') as $file) {
+        $attachmentName = 'attachment_' . $sno . '_' . $file->getClientOriginalName();
+        $file->move(public_path('staff_attachments/staff_' . $sno), $attachmentName);
+        $attachments[] = $attachmentName;
+      }
+    }
+
+   
+
+    // return json_encode($request->KnowledgeTag);
+    $access_bran = $request->acces_branch_id ?? [];
+    $access_fra  = $request->acces_franchise_id ?? [];
+    // Combine the two arrays
+    $access_multi = array_merge($access_bran, $access_fra);
+    $bran_multi   = json_encode($access_multi);
+
+    // Create new staff record
+    $add_staff = new StaffModel();
+    $add_staff->staff_id = $staff_id;
+    $add_staff->branch_id = $request->auth_branch_id;
+    $add_staff->shift_time_id = $request->shift_time;
+    $add_staff->multi_branch_access    = $bran_multi ?? '';
+    $add_staff->sub_department_id = $request->division_id ?? 0;
+    $add_staff->department_id = $request->department_id ?? 0;
+    $add_staff->role_id = $request->role_id;
+    $add_staff->exp_type = $request->staff_type;
+    $add_staff->staff_name = $request->staff_name;
+    $add_staff->mobile_no = $request->mobile_no;
+    $add_staff->alternative_no = $request->alternative_no;
+    $add_staff->email_id = $request->email_id;
+    $add_staff->gender = $request->gender;
+    $add_staff->dob = date('Y-m-d', strtotime($request->dob));
+    $add_staff->date_of_joining = date('Y-m-d', strtotime($request->date_of_joinig));
+    $add_staff->contact_person_name = $request->contact_person_name;
+    $add_staff->contact_person_no = $request->contact_person_no;
+    $add_staff->martial_status = $request->martial_status ?? null;
+    $add_staff->address = $request->address ?? null;
+    $add_staff->staff_image = $staff_image ?? null;
+    $add_staff->attachment = json_encode($attachments) ?? null;
+    $add_staff->nick_name = $request->nick_name ?? null;
+    $add_staff->position_role = $request->position_role ?? null;
+    $add_staff->description = $request->description ?? null;
+    $add_staff->basic_salary = $request->salary ?? null;
+    $add_staff->per_hour_cost = $request->hour_cost ?? null;
+    $add_staff->login_access = $request->login_access ?? 0;
+    $login_access = $request->login_access ?? 0;
+    $add_staff->employee_skill_id = $request->employee_skill;
+    if ($login_access == 1) {
+      $add_staff->user_name = $request->loginuser_name;
+      $add_staff->password  = $request->loginpassword;
+    } else {
+      $add_staff->user_name = '';
+      $add_staff->password  = '';
+    }
+    $add_staff->created_by = $request->user()->user_id;
+    $add_staff->updated_by = $request->user()->user_id;
+
+    $add_staff->save();
+    // return $add_staff->sno;
+    if ($add_staff) {
+      // Add User for login credentials
+      $login_access = $request->login_access;
+      if ($login_access == 1) {
+        User::create([
+          'user_id' => $add_staff->sno,
+          'role_id' => $request->role_id ?? 0,
+          'branch_id' =>  $request->auth_branch_id,
+          'entity_id' => $request->user()->entity_id,
+          'name' => $request->loginuser_name,
+          'password' => Hash::make($request->loginpassword),
+          'email' => $request->email_id,
+          'created_by' => $request->user()->user_id ?? 1,
+          'updated_by' => $request->user()->user_id ?? 1,
+        ]);
+      }
+
+
+      // Handle work information
+      if ($request->staff_type == 2) {
+        $positions = $request->input('position_') ?? [];
+        foreach ($positions as $key => $position) {
+          StaffWorkInfoModel::create([
+            'staff_id' => $add_staff->sno,
+            'staff_type' => $request->staff_type,
+            'position' => $position,
+            'year_of_experience' => $request->input("year_of_experience_")[$key] ?? 0,
+            'company_name' => $request->input("company_name_")[$key],
+            'work_start_date' => $request->input("exper_srt_date_")[$key] ? date('Y-m-d', strtotime($request->input("exper_srt_date_")[$key])) : null,
+            'work_end_date' => $request->input("exper_end_date_")[$key] ? date('Y-m-d', strtotime($request->input("exper_end_date_")[$key])) : null,
+            'created_by' => $request->user()->user_id,
+            'updated_by' => $request->user()->user_id,
+          ]);
+        }
+      }
+      // Handle staff credentials
+
+
+      session()->flash('toastr', [
+        'type' => 'success',
+        'message' => 'Staff added Successfully!'
+      ]);
+    } else {
+      session()->flash('toastr', [
+        'type' => 'error',
+        'message' => 'Could not add the Staff !'
+      ]);
+    }
+    return redirect('hr_management/staff');
+  }
+  // unq Check add
+  public function checkunique_user_name()
+  {
+    $username = request()->input('value');
+    $staff = StaffModel::where('user_name', $username)
+      ->where('status', '!=', 2)
+      ->first();
+
+    if ($staff) {
+      return response()->json([
+        'message' => 'Staff username already assigned!',
+        'data' => 1,
+      ], 200);
+    } else {
+      return response()->json([
+        'message' => 'Username available!',
+        'data' => 0,
+      ], 200);
+    }
+  }
+
+  public function checkStaffMobileExists(Request $request)
+  {
+    $staff_mobile = $request->input('mobile');
+
+    // Assuming you have a Lead model with a mobile field
+    // $exists = StaffModel::where('mobile_no', $staff_mobile)->exists();
+    $staff = StaffModel::where('mobile_no', $staff_mobile)
+      ->where('status', '!=', 2)
+      ->first();
+
+    if ($staff) {
+      return response()->json([
+        'message' => 'Staff Mobile Number already assigned!',
+        'data'    => 1,
+      ], 200);
+    } else {
+      return response()->json([
+        'message' => 'mobile no available!',
+        'data'    => 0,
+      ], 200);
+    }
+  }
+
+
+  public function edit()
+  {
+    return view('content.hr_management.hr_enroll.manage_staff.edit_staff');
+  }
+
+    // unq esit chk username
+  public function checkunique_user_name_edit()
+  {
+    $username = request()->input('value');
+    $id = request()->input('id');
+    // return $id;
+    $staff = StaffModel::where('user_name', $username)
+      ->where('status', '!=', 2)
+      ->where('sno', '!=', $id)
+      ->first();
+
+    if ($staff) {
+      return response()->json([
+        'message' => 'Staff username already assigned!',
+        'data' => $staff,
+      ], 200);
+    } else {
+      return response()->json([
+        'message' => 'Username available!',
+        'data' => 0,
+      ], 200);
+    }
+  }
+  // unq esit chk username
+  public function checkStaffMobileExists_edit()
+  {
+    $staff_mobile = request()->input('mobile');
+    $id           = request()->input('id');
+    // return $id;
+    $staff = StaffModel::where('mobile_no', $staff_mobile)
+      ->where('status', '!=', 2)
+      ->where('sno', '!=', $id)
+      ->first();
+
+    if ($staff) {
+      return response()->json([
+        'message' => 'Staff Mobile Number already assigned!',
+        'data'    => $staff,
+      ], 200);
+    } else {
+      return response()->json([
+        'message' => 'Mobile Number available!',
+        'data'    => 0,
+      ], 200);
+    }
+  }
+
+  public function exit_staff()
+  {
+    return view('content.hr_management.hr_enroll.manage_staff.exit_staff_list');
+  }
+}
